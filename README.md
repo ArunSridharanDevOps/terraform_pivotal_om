@@ -9,7 +9,9 @@ What these scripts will do:
 
 Requirements:
 GCP project with adequate quotas to deploy Pivotal Small or Large. 
+
 Permission to create a bastion host, bucket, and service account.
+
 Update required variables in project metadata. There are a lot of variables, but it's intentional to provide flexibilty. 
 
 TO DO's:
