@@ -106,7 +106,7 @@ if [ $? -ne 0 ]; then
      CIPHERTEXT=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:encrypt" -d "{\"plaintext\":\"$BASE64\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.ciphertext') 
      echo ${CIPHERTEXT} > $KEY.txt
      gsutil cp $KEY.txt gs://$BUCKET
-if
+fi
 }
 
 function get_password () {
