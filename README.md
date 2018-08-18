@@ -1,4 +1,4 @@
-Bash scripts to pull together all worlds used to automated the deployment of Pivotal on Google Cloud Platform. 
+Simple Bash scripts to automate the deployment of Pivotal on Google Cloud Platform. 
 
 What these scripts will do:
 1) create_bastion.sh will deploy a bastion host and bucket used as a control point to deploy Pivotal.
