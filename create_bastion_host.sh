@@ -32,19 +32,6 @@ function ask_for_confirmation {
   esac
 }
 
-
-function prompt () {
-read -p "Do you want to create $BUCKET bastion environment?. If you're sure you want to continue, type 'yes': `echo '\n> '`" ANSWER
-
-if [ "$ANSWER" != "yes" ]; then
-      echo
-      echo "Exiting without creating storage bucket $BUCKET or bastion host $BASTION_HOST."
-      echo
-      exit 1
-fi
-}
-
-
 function create_bucket () {
 gsutil mb -p $GOOGLE_PROJECT -c regional -l $REGION gs://$BUCKET/
 gsutil cp $STARTUP gs://$BUCKET/

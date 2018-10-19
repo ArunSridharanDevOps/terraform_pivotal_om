@@ -99,6 +99,7 @@ BASE64=$(echo -n "$CLEAR" | base64)
 
 function store_password () {
 #key=${BUCKET}
+gsutil mb gs://$KMSBUCKET
 gcloud kms keyrings create $keyring --location global
 gcloud kms keys create $KEY --location global --keyring $keyring --purpose encryption
 if [ $? -ne 0 ]; then
