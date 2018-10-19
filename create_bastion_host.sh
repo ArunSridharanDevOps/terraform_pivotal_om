@@ -8,7 +8,7 @@ if [ $# -ne 1 ]; then
 fi
 export QUIET=0
 export ENVIRONMENT=$1
-export GOOGLE_PROJECT=$(gcloud config get-value project)
+export GOOGLE_PROJECT=$(gcloud config list --format 'value(core.project)')
 export ZONE=us-central1-a
 export REGION=us-central1
 export BASTION_HOST=$GOOGLE_PROJECT-$ENVIRONMENT
