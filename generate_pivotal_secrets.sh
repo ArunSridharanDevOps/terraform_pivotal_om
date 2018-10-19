@@ -67,6 +67,7 @@ openssl x509 -req -days 365 -in $PIVOTALURL.csr -signkey $PIVOTALURL.key -out $P
 function create_terraform_variables () {
 echo "env_name         = \"$ENVIRONMENT\"" > $TERRAFORMVARS
 echo "region           = \"$REGION\"" >> $TERRAFORMVARS
+echo "internetless           = \"true\"" >> $TERRAFORMVARS
 echo "opsman_image_url = \"$opsman_image_url\"" >> $TERRAFORMVARS
 echo "zones            = [\"$GCPZONE1\", \"$GCPZONE2\", \"$GCPZONE3\"]" >> $TERRAFORMVARS
 echo "project          = \"$GOOGLE_PROJECT\"" >> $TERRAFORMVARS
