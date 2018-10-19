@@ -17,6 +17,7 @@ export localityName=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[
 export keyring=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[] | select(.key == "pivotal_keyring") | .value')
 export GOOGLE_PROJECT=$(gcloud config get-value project)
 export BUCKET=$GOOGLE_PROJECT-$ENVIRONMENT
+export KMSBUCKET=$GOOGLE_PROJECT-VAULT
 export KEY=$GOOGLE_PROJECT-$ENVIRONMENT
 export TERRAFORMVARS=terraform.tfvars
 export PIVOTALURL=pcf.$ENVIRONMENT.$DNSDOMAIN
@@ -97,7 +98,7 @@ BASE64=$(echo -n "$CLEAR" | base64)
 }
 
 function store_password () {
-key=${BUCKET}
+#key=${BUCKET}
 gcloud kms keyrings create $keyring --location global
 gcloud kms keys create $KEY --location global --keyring $keyring --purpose encryption
 if [ $? -ne 0 ]; then
@@ -105,12 +106,12 @@ if [ $? -ne 0 ]; then
      	else
      CIPHERTEXT=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:encrypt" -d "{\"plaintext\":\"$BASE64\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.ciphertext') 
      echo ${CIPHERTEXT} > $KEY.txt
-     gsutil cp $KEY.txt gs://$BUCKET
+     gsutil cp $KEY.txt gs://$KMSBUCKET
 fi
 }
 
 function get_password () {
-CIPHERTEXT=$(gsutil cat gs://$BUCKET/$KEY.txt)
+CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$KEY.txt)
 BACK2BASE64=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:decrypt" -d "{\"ciphertext\":\"$CIPHERTEXT\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.plaintext') 
 DECODE=$(echo "$BACK2BASE64" | base64 --decode && echo)
 }

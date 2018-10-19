@@ -15,6 +15,7 @@ export opsman_image_url=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.it
 export keyring=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[] | select(.key == "pivotal_keyring") | .value')
 export GOOGLE_PROJECT=$(gcloud config get-value project)
 export BUCKET=$GOOGLE_PROJECT-$ENVIRONMENT
+export KMSBUCKET=$GOOGLE_PROJECT-VAULT
 export KEY=$GOOGLE_PROJECT-$ENVIRONMENT
 export PIVOTALURL=pcf.$ENVIRONMENT.$DNSDOMAIN
 export SERVICE_ACCOUNT_KEY=terraform.$ENVIRONMENT.json
@@ -24,7 +25,7 @@ export OM_CORE_COMMAND="om --target https://$PIVOTALURL --skip-ssl-validation --
 }
 
 function get_password () {
-CIPHERTEXT=$(gsutil cat gs://$BUCKET/$KEY.txt)
+CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$KEY.txt)
 BACK2BASE64=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:decrypt" -d "{\"ciphertext\":\"$CIPHERTEXT\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.plaintext') 
 DECODE=$(echo "$BACK2BASE64" | base64 --decode && echo)
 export PASS=$DECODE
