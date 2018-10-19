@@ -27,7 +27,7 @@ export USER=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[] | sele
 export keyring=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[] | select(.key == "pivotal_keyring") | .value')
 export GOOGLE_PROJECT=$(gcloud config get-value project)
 export BUCKET=$GOOGLE_PROJECT-$ENVIRONMENT
-export KMSBUCKET=$GOOGLE_PROJECT-VAULT
+export KMSBUCKET=$GOOGLE_PROJECT-vault
 export KEY=$GOOGLE_PROJECT-$ENVIRONMENT
 export PIVOTALURL=pcf.$ENVIRONMENT.$DNSDOMAIN
 export PRIVATE_KEY=$(/usr/bin/env ruby -e 'p ARGF.read' $PIVOTALURL.key)

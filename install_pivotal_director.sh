@@ -15,7 +15,7 @@ export opsman_image_url=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.it
 export keyring=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[] | select(.key == "pivotal_keyring") | .value')
 export GOOGLE_PROJECT=$(gcloud config get-value project)
 export BUCKET=$GOOGLE_PROJECT-$ENVIRONMENT
-export KMSBUCKET=$GOOGLE_PROJECT-VAULT
+export KMSBUCKET=$GOOGLE_PROJECT-vault
 export KEY=$GOOGLE_PROJECT-$ENVIRONMENT
 export PIVOTALURL=pcf.$ENVIRONMENT.$DNSDOMAIN
 export SERVICE_ACCOUNT_KEY=terraform.$ENVIRONMENT.json

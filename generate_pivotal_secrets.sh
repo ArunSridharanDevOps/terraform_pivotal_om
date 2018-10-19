@@ -17,7 +17,7 @@ export localityName=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[
 export keyring=$(echo $PROJECT_INFO | jq -r '.commonInstanceMetadata.items[] | select(.key == "pivotal_keyring") | .value')
 export GOOGLE_PROJECT=$(gcloud config get-value project)
 export BUCKET=$GOOGLE_PROJECT-$ENVIRONMENT
-export KMSBUCKET=$GOOGLE_PROJECT-VAULT
+export KMSBUCKET=$GOOGLE_PROJECT-vault
 export KEY=$GOOGLE_PROJECT-$ENVIRONMENT
 export TERRAFORMVARS=terraform.tfvars
 export PIVOTALURL=pcf.$ENVIRONMENT.$DNSDOMAIN
