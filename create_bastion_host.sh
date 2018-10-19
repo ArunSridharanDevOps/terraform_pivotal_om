@@ -6,6 +6,7 @@ if [ $# -ne 1 ]; then
     echo $0: usage: Requires argument of environment e.g. web, mobile, unicorn, zebra, just pick a name, anyname 
     exit 1
 fi
+export QUIET=0
 export ENVIRONMENT=$1
 export GOOGLE_PROJECT=$(gcloud config get-value project)
 export ZONE=us-central1-a
@@ -15,6 +16,22 @@ export BUCKET=$GOOGLE_PROJECT-$ENVIRONMENT
 export STARTUP=install_prerequisites.sh
 export METADATA=pivotal-environment
 }
+
+function ask_for_confirmation {
+  if [ $QUIET -eq 1 ]; then
+    return 0
+  fi
+  read -p "${1} [y/N] " yn
+  case $yn in
+    [Yy]* )
+      return 0
+      ;;
+    * )
+      exit 1
+      ;;
+  esac
+}
+
 
 function prompt () {
 read -p "Do you want to create $BUCKET bastion environment?. If you're sure you want to continue, type 'yes': `echo '\n> '`" ANSWER
@@ -39,6 +56,6 @@ gcloud --project $GOOGLE_PROJECT compute project-info add-metadata --metadata=$M
 }
 
 set_variables $1
-prompt
+ask_for_confirmation 'Do you want to create Storage Bucket and Bastion host named '$BUCKET'?'
 create_bucket
 create_bastion
