@@ -20,7 +20,7 @@ sudo chown -R $ID:$ID /$ENVIRONMENT
 gsutil cp gs://$BUCKET/$TERRAFORMVARS /$ENVIRONMENT
 cd /$ENVIRONMENT
 terraform init /$ENVIRONMENT
-terraform apply -var internetless=$internetless -auto-approve /$ENVIRONMENT
+terraform apply -auto-approve /$ENVIRONMENT
 gsutil cp /$ENVIRONMENT/$TERRAFORMSTATE gs://$BUCKET/
 }
 
