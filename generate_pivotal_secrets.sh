@@ -94,7 +94,7 @@ gsutil cp $PIVOTALURL.key gs://$BUCKET
 
 function generate_password () {
 CLEAR=$(openssl rand -base64 32)
-BASE64=$(echo -n "$CLEAR" | base64)
+export BASE64=$(echo -n "$CLEAR" | base64)
 }
 
 function store_password () {
