@@ -20,7 +20,7 @@ sudo apt-get install cf-cli
 
 function install_terraform () {
 sudo apt-get install --assume-yes jq unzip git
-latest_version=$(curl --silent https://releases.hashicorp.com/terraform/ |grep terraform | head -1 |awk -F_ '{print $2}' |awk -F[\<\] '{print $1}')
+latest_version=$(curl --silent https://releases.hashicorp.com/terraform/ |grep terraform |grep -v alpha |grep -v beta | head -1 |awk -F_ '{print $2}' |awk -F[\<\] '{print $1}')
 terraform_url=$(curl --silent https://releases.hashicorp.com/index.json | jq '{terraform}' | grep "$latest_version" | grep "url" | egrep "linux.*64" | sort -h | head -1 | awk -F[\"] '{print $4}')
 # Download Terraform. URI: https://www.terraform.io/downloads.html
 curl -o terraform.zip $terraform_url
