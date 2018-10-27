@@ -100,19 +100,43 @@ export BASE64=$(echo -n "$CLEAR" | base64)
 
 function store_password () {
 gsutil mb gs://$KMSBUCKET
+
 gcloud kms keyrings create $keyring --location global
+
 gcloud kms keys create $KEY --location global --keyring $keyring --purpose encryption
-if [ $? -ne 0 ]; then
-     echo "Key already exists skipping to prevent overwriting password"
-     	else
-     CIPHERTEXT=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:encrypt" -d "{\"plaintext\":\"$BASE64\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.ciphertext') 
-     echo ${CIPHERTEXT} > $KEY.txt
-     gsutil cp $KEY.txt gs://$KMSBUCKET
+
+VALIDKEYSTATUS='ENABLED'
+KEYSTATUS=$(gcloud kms keys list --keyring=$keyring --location=global |grep $KEY |awk '{print $4}')
+if [ "$VALIDKEYSTATUS" = "$KEYSTATUS" ]; then
+   echo "$KEY key is in valid state. Moving forward with encryption"
+   else 
+   echo "$KEY key is in an invalid state. Check Cryptographic Keys and exiting"
+   exit 1
+fi
+
+ENCRYPTINFO=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:encrypt" -d "{\"plaintext\":\"$BASE64\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json") 
+
+KMSPERMCHECK=$(echo $ENCRYPTINFO |jq -r '.error|.code') 
+
+if [ ${KMSPERMCHECK} = 403 ]; then
+    echo "Must have KMS permission. Exiting"
+    exit
+fi
+
+CIPHERTEXT=$(echo $ENCRYPTINFO| jq -r '.ciphertext') 
+
+echo ${CIPHERTEXT} > $PIVOTALURL.txt
+
+gsutil -q stat gs://$KMSBUCKET/$PIVOTALURL.txt 
+if [ $? = 0 ]; then
+    echo "gs://$KMSBUCKET/$PIVOTALURL.txt already exists. No need to copy"
+    else
+    gsutil cp $PIVOTALURL.txt gs://$KMSBUCKET
 fi
 }
 
 function get_password () {
-CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$KEY.txt)
+CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$PIVOTALURL.txt)
 BACK2BASE64=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:decrypt" -d "{\"ciphertext\":\"$CIPHERTEXT\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.plaintext') 
 DECODE=$(echo "$BACK2BASE64" | base64 --decode && echo)
 }

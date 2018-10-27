@@ -39,10 +39,10 @@ export OM_CORE_COMMAND="om --target https://$PIVOTALURL --skip-ssl-validation --
 }
 
 function get_password () {
-CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$KEY.txt)
+CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$PIVOTALURL.txt)
 BACK2BASE64=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:decrypt" -d "{\"ciphertext\":\"$CIPHERTEXT\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.plaintext') 
 DECODE=$(echo "$BACK2BASE64" | base64 --decode && echo)
-export PASS=$DECODE
+PASS=$(echo "$BACK2BASE64" | base64 --decode && echo)
 }
 
 function download_elastic_runtime_code () {
@@ -115,10 +115,10 @@ $OM_CORE_COMMAND apply-changes
 }
 
 set_variables
-#download_elastic_runtime_code
-#upload_elastic_runtime_code
-#configure_elastic_runtime_zones
-#configure_elastic_runtime_routers
-#configure_elastic_runtime_uaa
-#configure_elastic_runtime_resources
+download_elastic_runtime_code
+upload_elastic_runtime_code
+configure_elastic_runtime_zones
+configure_elastic_runtime_routers
+configure_elastic_runtime_uaa
+configure_elastic_runtime_resources
 apply_ops_manager_changes

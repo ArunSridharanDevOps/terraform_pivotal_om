@@ -25,12 +25,11 @@ export OM_CORE_COMMAND="om --target https://$PIVOTALURL --skip-ssl-validation --
 }
 
 function get_password () {
-CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$KEY.txt)
+CIPHERTEXT=$(gsutil cat gs://$KMSBUCKET/$PIVOTALURL.txt)
 BACK2BASE64=$(curl -s -X POST "https://cloudkms.googleapis.com/v1/projects/$GOOGLE_PROJECT/locations/global/keyRings/$keyring/cryptoKeys/$KEY:decrypt" -d "{\"ciphertext\":\"$CIPHERTEXT\"}" -H "Authorization:Bearer $(gcloud auth print-access-token)" -H "Content-Type:application/json"| jq -r '.plaintext') 
 DECODE=$(echo "$BACK2BASE64" | base64 --decode && echo)
-export PASS=$DECODE
+PASS=$DECODE
 }
-
 
 function configure_ops_manager_authetication () {
 $OM_CORE_COMMAND configure-authentication --username $USER --password $PASS --decryption-passphrase $PASS
@@ -59,11 +58,11 @@ $OM_CORE_COMMAND configure-director --networks-configuration '{
 "icmp_checks_enabled": false,
   "networks": [
     {
-      "name": "opsman-network",
+      "name": "'$ENVIRONMENT'-infrastructure-subnet",
       "subnets": [
         {
-          "iaas_identifier": "'$ENVIRONMENT'-pcf-network/'$ENVIRONMENT'-management-subnet/'$REGION'",
-          "cidr": "10.0.0.0/24",
+          "iaas_identifier": "'$ENVIRONMENT'-pcf-network/'$ENVIRONMENT'-infrastructure-subnet/'$REGION'",
+          "cidr": "10.0.0.0/26",
           "reserved_ip_ranges": "10.0.0.0-10.0.0.4",
           "dns": "8.8.8.8",
           "gateway": "10.0.0.1",
@@ -76,11 +75,11 @@ $OM_CORE_COMMAND configure-director --networks-configuration '{
       ]
     },
     {
-      "name": "ert-network",
+      "name": "'$ENVIRONMENT'-pas-subnet",
       "subnets": [
         {
           "iaas_identifier": "'$ENVIRONMENT'-pcf-network/'$ENVIRONMENT'-pas-subnet/'$REGION'",
-          "cidr": "10.0.4.0/22",
+          "cidr": "10.0.4.0/24",
           "reserved_ip_ranges": "10.0.4.0-10.0.4.4",
           "dns": "8.8.8.8",
           "gateway": "10.0.4.1",
@@ -93,11 +92,11 @@ $OM_CORE_COMMAND configure-director --networks-configuration '{
       ]
     },
     {
-      "name": "services-network",
+      "name": "'$ENVIRONMENT'-services-subnet",
       "subnets": [
         {
           "iaas_identifier": "'$ENVIRONMENT'-pcf-network/'$ENVIRONMENT'-services-subnet/'$REGION'",
-          "cidr": "10.0.8.0/22",
+          "cidr": "10.0.8.0/24",
           "reserved_ip_ranges": "10.0.8.0-10.0.8.4",
           "dns": "8.8.8.8",
           "gateway": "10.0.8.1",
@@ -119,7 +118,7 @@ $OM_CORE_COMMAND configure-director --network-assignment '{
  "name": "'$GCPZONE1'"
 },
 "network": {
- "name": "opsman-network"
+ "name": "'$ENVIRONMENT'-infrastructure-subnet"
   }
 }'  
 }
