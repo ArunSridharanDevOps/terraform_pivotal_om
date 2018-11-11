@@ -12,16 +12,17 @@ export BUCKET=$GOOGLE_PROJECT-$ENVIRONMENT
 export TERRAFORMVARS=terraform.tfvars
 export TERRAFORMSTATE=terraform.tfstate
 export PIVOTALURL=pcf.$ENVIRONMENT.$DNSDOMAIN
+export TERRAFORMING_PAS=terraforming-pas
 }
 
 function install_pivotal_infrastructure () {
 ID=$(whoami)
-sudo chown -R $ID:$ID /$ENVIRONMENT
-gsutil cp gs://$BUCKET/$TERRAFORMVARS /$ENVIRONMENT
-cd /$ENVIRONMENT
-terraform init /$ENVIRONMENT
-terraform apply -auto-approve /$ENVIRONMENT
-gsutil cp /$ENVIRONMENT/$TERRAFORMSTATE gs://$BUCKET/
+sudo chown -R $ID:$ID /$ENVIRONMENT/$TERRAFORMING_PAS
+gsutil cp gs://$BUCKET/$TERRAFORMVARS /$ENVIRONMENT/$TERRAFORMING_PAS
+cd /$ENVIRONMENT/$TERRAFORMING_PAS
+terraform init /$ENVIRONMENT/$TERRAFORMING_PAS
+terraform apply -auto-approve /$ENVIRONMENT/$TERRAFORMING_PAS
+gsutil cp /$ENVIRONMENT/$TERRAFORMING_PAS/$TERRAFORMSTATE gs://$BUCKET/
 }
 
 set_variables
