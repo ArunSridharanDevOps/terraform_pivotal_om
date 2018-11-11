@@ -68,9 +68,9 @@ $OM_CORE_COMMAND available-products
 }
 
 function configure_elastic_runtime_zones () {
-$OM_CORE_COMMAND configure-product --product-name cf --product-network "{\"singleton_availability_zone\":{\"name\":\"$GCPZONE1\"},\"other_availability_zones\":[{\"name\":\"$GCPZONE1\"},{\"name\":\"$GCPZONE2\"},{\"name\":\"$GCPZONE3\"}],\"network\":{\"name\":\"ert-network\"}}"
+$OM_CORE_COMMAND configure-product --product-name cf --product-network "{\"singleton_availability_zone\":{\"name\":\"$GCPZONE1\"},\"other_availability_zones\":[{\"name\":\"$GCPZONE1\"},{\"name\":\"$GCPZONE2\"},{\"name\":\"$GCPZONE3\"}],\"network\":{\"name\":\"$ENVIRONMENT-pas-subnet\"}}"
 
-$OM_CORE_COMMAND configure-product --product-name cf --product-properties "{\".cloud_controller.system_domain\":{\"value\":\"sys.$ENVIRONMENT.$DNSDOMAIN\"},\".cloud_controller.apps_domain\":{\"value\":\"apps.$ENVIRONMENT.$DNSDOMAIN\"},\".ha_proxy.skip_cert_verify\":{\"value\":true},\".properties.networking_point_of_entry\":{\"value\":\"external_ssl\"},\".properties.security_acknowledgement\":{\"value\":\"X\"},\".mysql_monitor.recipient_email\":"{\"value\":\"root@$DNSDOMAIN\"}"}"
+$OM_CORE_COMMAND configure-product --product-name cf --product-properties "{\".cloud_controller.system_domain\":{\"value\":\"sys.$ENVIRONMENT.$DNSDOMAIN\"},\".cloud_controller.apps_domain\":{\"value\":\"apps.$ENVIRONMENT.$DNSDOMAIN\"},\".ha_proxy.skip_cert_verify\":{\"value\":true},\".properties.security_acknowledgement\":{\"value\":\"X\"},\".mysql_monitor.recipient_email\":"{\"value\":\"root@$DNSDOMAIN\"}"}"
 }
 
 function configure_elastic_runtime_routers () {
