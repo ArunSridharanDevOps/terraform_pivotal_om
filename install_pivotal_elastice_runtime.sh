@@ -75,7 +75,15 @@ $OM_CORE_COMMAND configure-product --product-name cf --product-properties "{\".c
 
 function configure_elastic_runtime_routers () {
 TEMPCMD=/tmp/config_router.$$
-echo "$OM_CORE_COMMAND configure-product --product-name cf --product-properties '{\".properties.networking_poe_ssl_cert\": {\"value\": $ROUTER_SSL_CERT},\".properties.gorouter_ssl_ciphers\": {\"value\": \"ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384\"},\".properties.haproxy_ssl_ciphers\": {\"value\": \"DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384\"},\".properties.haproxy_forward_tls\": {\"value\": \"disable\"}}'" > $TEMPCMD
+echo "$OM_CORE_COMMAND configure-product --product-name cf --product-properties '{\".properties.gorouter_ssl_ciphers\": {\"value\": \"ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384\"},\".properties.haproxy_ssl_ciphers\": {\"value\": \"DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384\"},\".properties.haproxy_forward_tls\": {\"value\": \"disable\"}}'" > $TEMPCMD
+chmod 700 $TEMPCMD
+$TEMPCMD
+rm $TEMPCMD
+}
+
+function configure_poe_ssl () {
+TEMPCMD=/tmp/config_router.$$
+echo "$OM_CORE_COMMAND configure-product --product-name cf --product-properties '{\".properties.networking_poe_ssl_certs\": {\"value\": [{ \"certificate\": $ROUTER_SSL_CERT ,\"name\": \"$ENVIRONMENT\"}]}}'" > $TEMPCMD
 chmod 700 $TEMPCMD
 $TEMPCMD
 rm $TEMPCMD
@@ -115,10 +123,11 @@ $OM_CORE_COMMAND apply-changes
 }
 
 set_variables
-download_elastic_runtime_code
-upload_elastic_runtime_code
+#download_elastic_runtime_code
+#upload_elastic_runtime_code
+configure_poe_ssl
 configure_elastic_runtime_zones
 configure_elastic_runtime_routers
 configure_elastic_runtime_uaa
 configure_elastic_runtime_resources
-apply_ops_manager_changes
+#apply_ops_manager_changes
