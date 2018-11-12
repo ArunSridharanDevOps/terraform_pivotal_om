@@ -43,6 +43,7 @@ fi
 function download_terraform_repo () {
 ENVIRONMENT=$(gcloud compute project-info describe --format=json | jq -r '.commonInstanceMetadata.items[] | select(.key == "pivotal-environment") | .value')
 sudo git clone https://github.com/pivotal-cf/terraforming-gcp /$ENVIRONMENT
+sudo git clone https://github.com/jasonbisson/terraform_pivotal_om
 }
 
 install_om 
