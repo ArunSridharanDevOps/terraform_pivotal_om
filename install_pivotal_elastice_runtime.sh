@@ -34,6 +34,14 @@ export PRIVATE_KEY=$(/usr/bin/env ruby -e 'p ARGF.read' $PIVOTALURL.key)
 export SSL_CERT=$(/usr/bin/env ruby -e 'p ARGF.read' $PIVOTALURL.crt)
 export ROUTER_SSL_CERT=$(echo '{"cert_pem":'${SSL_CERT}',"private_key_pem":'${PRIVATE_KEY}'}')
 export UAA_SSL_CERT=$(echo '{"cert_pem":'${SSL_CERT}',"private_key_pem":'${PRIVATE_KEY}'}')
+export TERRAFORMING_PAS=terraforming-pas
+export SQL_DB_PORT=3306
+export SQL_DB_IP=$(jq -e --raw-output '.modules[0].outputs | map_values(.value)' /$ENVIRONMENT/$TERRAFORMING_PAS/terraform.tfstate |jq -r '.sql_db_ip')
+export SQL_INSTANCE=$(jq -e --raw-output '.modules[1].outputs | map_values(.value)' /$ENVIRONMENT/$TERRAFORMING_PAS/terraform.tfstate |jq -r '.sql_instance')
+export PAS_SQL_PASSWORD=$(jq -e --raw-output '.modules[0].outputs | map_values(.value)' /$ENVIRONMENT/$TERRAFORMING_PAS/terraform.tfstate |jq -r '.pas_sql_password')
+export PAS_SQL_USERNAME=$(jq -e --raw-output '.modules[0].outputs | map_values(.value)' /$ENVIRONMENT/$TERRAFORMING_PAS/terraform.tfstate |jq -r '.pas_sql_username')
+gcloud beta sql ssl server-ca-certs list --format='value(cert)' --instance=$SQL_INSTANCE > $SQL_INSTANCE
+export SSL_DB_CERT=$(/usr/bin/env ruby -e 'p ARGF.read' $SQL_INSTANCE)
 get_password
 export OM_CORE_COMMAND="om --target https://$PIVOTALURL --skip-ssl-validation --username $USER --password $PASS"
 }
@@ -118,11 +126,19 @@ done
 fi
 }
 
+function update_credhub_db () {
+gcloud beta sql ssl server-ca-certs list --format='value(cert)' --instance=$SQL_INSTANCE
+om --target https://$PIVOTALURL --skip-ssl-validation --username $USER --password $PASS configure-product --product-name cf --product-properties "{\".properties.db_host\":{\"value\":\"$HOST\"},\".properties.root_service_account_json\":{\"value\":$SERVICE_KEY},\".properties.db_username\":{\"value\":\"$ENVIRONMENT-$SERVICE_BROKER_DB\"},\".properties.db_password\":{\"value\":{\"secret\":\"$PASS\"}}}"
+
+om --target https://$PIVOTALURL --skip-ssl-validation --username $USER --password $PASS configure-product --product-name cf --product-properties "{\".properties.ca_cert\":{\"value\":$SERVER_CERT},\".properties.client_cert\":{\"value\":$CLIENT_CERT},\".properties.client_key\":{\"value\":$PRIVATE_KEY}}"
+}
+
 function apply_ops_manager_changes () {
 $OM_CORE_COMMAND apply-changes
 }
 
 set_variables
+exit
 #download_elastic_runtime_code
 #upload_elastic_runtime_code
 configure_poe_ssl
