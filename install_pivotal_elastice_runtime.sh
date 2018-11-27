@@ -129,13 +129,11 @@ fi
 function update_credhub_db () {
 TEMPCMD=/tmp/config_credhub.$$
 $OM_CORE_COMMAND configure-product --product-name cf --product-properties "{\".properties.credhub_database\":{\"value\":\"internal_mysql\"}}"
-
-echo "$OM_CORE_COMMAND configure-product --product-name cf --product-properties '{\".properties.credhub_key_encryption_passwords\":{\"value\": [{\"name\": \"$ENVIRONMENT\",\"provider\": \"internal\",\"key\": {\"secret\":\"$PASS\"}}]}}'" > $TEMPCMD
+echo "$OM_CORE_COMMAND configure-product --product-name cf --product-properties '{\".properties.credhub_key_encryption_passwords\":{\"value\": [{\"name\": \"$ENVIRONMENT\",\"provider\": \"internal\",\"key\": {\"secret\":\"$PASS\"},\"primary\": \"true\"}]}}'" > $TEMPCMD
 chmod 700 $TEMPCMD
 $TEMPCMD
 rm $TEMPCMD
 }
-
 
 function apply_ops_manager_changes () {
 $OM_CORE_COMMAND apply-changes
@@ -150,4 +148,4 @@ configure_elastic_runtime_zones
 configure_elastic_runtime_routers
 configure_elastic_runtime_uaa
 configure_elastic_runtime_resources
-#apply_ops_manager_changes
+apply_ops_manager_changes
