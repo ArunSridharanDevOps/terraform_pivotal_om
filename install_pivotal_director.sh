@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x
+set -x
 
 function set_variables () {
 export PROJECT_INFO=$(gcloud compute project-info describe --format=json)
@@ -36,11 +36,7 @@ $OM_CORE_COMMAND configure-authentication --username $USER --password $PASS --de
 }
 
 function configure_ops_iaas () {
-TEMPCMD=/tmp/config_iaas.$$
-echo "$OM_CORE_COMMAND configure-director --iaas-configuration '{\"project\": \"$GOOGLE_PROJECT\", \"default_deployment_tag\":\"$ENVIRONMENT\", \"auth_json\":$SERVICE_ACCOUNT_KEY_2_STRING}'" > $TEMPCMD
-chmod 700 $TEMPCMD
-$TEMPCMD
-rm $TEMPCMD
+$OM_CORE_COMMAND configure-director --iaas-configuration '{"project":"'$GOOGLE_PROJECT'","default_deployment_tag":"'$ENVIRONMENT'","associated_service_account":"'$ENVIRONMENT'-opsman@'$GOOGLE_PROJECT'.iam.gserviceaccount.com"}'
 }
 
 function configure_ops_az () {
