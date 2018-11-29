@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 
 function set_variables () {
 export PROJECT_INFO=$(gcloud compute project-info describe --format=json)

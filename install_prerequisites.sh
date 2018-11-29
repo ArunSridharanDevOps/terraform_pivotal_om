@@ -8,6 +8,14 @@ sudo apt-get update
 sudo apt-get install om
 }
 
+
+function install_om_legacy () {
+sudo rm om-linux*
+sudo wget https://github.com/pivotal-cf/om/releases/download/0.44.0/om-linux
+sudo chmod +x om-linux
+sudo cp -p om-linux /usr/bin/om
+}
+
 function install_cf_uacc () {
 sudo wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
 sudo echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
@@ -46,7 +54,7 @@ sudo git clone https://github.com/pivotal-cf/terraforming-gcp /$ENVIRONMENT
 sudo git clone https://github.com/jasonbisson/terraform_pivotal_om
 }
 
-install_om 
+install_om_legacy
 install_cf_uacc
 install_terraform
 download_terraform_repo
